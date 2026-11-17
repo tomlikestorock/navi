@@ -1,0 +1,4 @@
+# On-call handoff
+
+Leave the next on-call a summary: open alerts, degraded services, and the
+paging runbook for anything still noisy.

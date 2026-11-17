@@ -1,0 +1,75 @@
+{
+  // Copy this file to your project root as navi.json, then trim.
+  //
+  // Optional editor support: if navi.schema.json sits next to your config,
+  // uncomment:
+  // "$schema": "./navi.schema.json",
+
+  // ---- Corpuses: the searchable systems navi federates over ----
+  "corpuses": [
+    {
+      "id": "docs",
+      "type": "files",
+      "description": "Project documentation",
+      "options": {
+        "path": "./docs",
+        "extensions": [".md"],
+        "ignore": ["drafts/**"],
+        "maxFiles": 5000
+        // "embedEager": true   // block once on first search to warm embeddings
+      }
+      // "embed": "local-xs"    // embedding provider id, see below
+    }
+
+    // A web corpus fetches + caches + searches pages (embeddings on read):
+    // {
+    //   "id": "wiki",
+    //   "type": "web",
+    //   "embed": "local-xs",
+    //   "options": { "urls": ["https://example.com/docs/a"], "maxPages": 10 }
+    // }
+
+    // A custom corpus module: `type: "custom"` plus `module` — a
+    // `./`/`../` path resolves from this config file; a bare name resolves
+    // from node_modules. The module default-exports a CorpusClass and imports
+    // its contract (and `z`) from `navi/core`. See examples/copy-out/ for a
+    // complete, copyable corpus with its own optionsSchema:
+    // {
+    //   "id": "notes",
+    //   "type": "custom",
+    //   "module": "./copy-out/corpus.ts",
+    //   "options": { "path": "./copy-out/notes" }
+    // }
+  ]
+
+  // ---- Embeddings: hosted or local providers (optional) ----
+  // "embeddings": [
+  //   { "id": "local-xs", "type": "openai-compatible",
+  //     "baseUrl": "http://localhost:11434/v1",       // ollama
+  //     "model": "snowflake-arctic-embed:22m" }
+  // ],
+
+  // ---- Analyzer: situation detectors, in order (optional) ----
+  // "analyzer": {
+  //   "detectors": [
+  //     { "id": "lexicon", "type": "lexicon" },
+  //     { "id": "command", "type": "command" },
+  //     { "id": "path", "type": "path" },
+  //     { "id": "tool", "type": "tool" }
+  //     // Gated model detector (runs only when the deterministic tier
+  //     // found nothing):
+  //     // { "id": "model", "type": "model",
+  //     //   "options": { "when": "low-confidence", "provider": "decider" } }
+  //   ]
+  // },
+
+  // ---- Models: providers for the gated tiers (optional) ----
+  // "models": [
+  //   { "id": "decider", "model": "tev1:0.8b",
+  //     "runner": { "type": "systemone",
+  //                 "baseUrl": "http://localhost:11434" } }
+  // ],
+
+  // ---- Filter: decision-model applicability pruning (optional) ----
+  // "filter": { "provider": "decider", "topK": 8 }
+}

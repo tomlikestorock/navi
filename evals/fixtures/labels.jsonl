@@ -1,0 +1,20 @@
+{"query":"force push shared branch","relevant":["docs:git/never-force-push-shared.md"]}
+{"query":"canary error budget promotion","relevant":["docs:deployment/canary-error-budget.md"]}
+{"query":"schema migration expand contract","relevant":["docs:deployment/schema-migrations.md"]}
+{"query":"rotate committed secrets","relevant":["docs:security/secrets-rotation.md"]}
+{"query":"backfill job checkpoint","relevant":["docs:data/backfill-idempotency.md"]}
+{"query":"git lfs binary artifacts","relevant":["docs:git/binary-artifacts.md"]}
+{"query":"undo a release that broke production","relevant":["docs:deployment/blue-green-rollback.md"]}
+{"query":"make the commit log linear before review","relevant":["docs:git/rebase-feature-branch.md"]}
+{"query":"someone leaked a credential","relevant":["docs:security/secrets-rotation.md"]}
+{"query":"remove customer records when the retention window closes","relevant":["docs:data/pii-retention.md"]}
+{"query":"upgrade a package with a known cve","relevant":["docs:security/dependency-vulnerabilities.md"]}
+{"query":"where do we keep build outputs","relevant":["docs:git/binary-artifacts.md"]}
+{"query":"how much traffic before full rollout","relevant":["docs:deployment/canary-error-budget.md"]}
+{"query":"changing the database structure during deploy","relevant":["docs:deployment/schema-migrations.md"]}
+{"query":"purge git history after a credential leak","relevant":["docs:security/secrets-rotation.md"]}
+{"query":"delete backups that pass the retention window","relevant":["docs:data/pii-retention.md"]}
+{"query":"promote traffic only after health checks pass","relevant":["docs:deployment/blue-green-rollback.md","docs:deployment/canary-error-budget.md"]}
+{"query":"rewrite unpublished history on a feature branch","relevant":["docs:git/rebase-feature-branch.md"]}
+{"query":"batch a migration that writes production rows","relevant":["docs:data/backfill-idempotency.md"]}
+{"query":"pin the patched version of a dependency","relevant":["docs:security/dependency-vulnerabilities.md"]}

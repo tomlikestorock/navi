@@ -1,0 +1,4 @@
+Deploy checklist
+
+Before deploying: run the smoke tests, check the rollback path, and announce
+the deploy in #releases. Deploying on a Friday needs a second pair of eyes.

@@ -1,0 +1,4 @@
+Git branch hygiene
+
+Never force-push a shared branch; rewrite your own branch instead. Rebase
+before opening a pull request so the diff stays reviewable.

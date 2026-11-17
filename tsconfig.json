@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "esnext",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "allowArbitraryExtensions": true,
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "customConditions": ["development"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Core is reachable from adapters and the web app without deep paths.
+       `navi/core` mirrors the package `exports` development condition so the
+       type checker and the runtime agree. */
+    "paths": {
+      "#core/*": ["./src/core/*"],
+      "navi/core": ["./src/core/contract.ts"]
+    }
+  },
+  "include": ["src", "scripts", "examples", "plugin"]
+}

@@ -1,0 +1,4 @@
+Release notes
+
+Tag the release, ship the changelog, and note any migration steps for
+operators. Keep the notes short enough to read during a deploy.

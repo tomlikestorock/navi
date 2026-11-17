@@ -1,0 +1,13 @@
+{
+  // Everything here is relative to this folder, so the whole directory can be
+  // copied out of the repo and run as-is. See README.md.
+  "corpuses": [
+    {
+      "id": "notes",
+      "type": "custom",
+      "description": "Plain-text notes in ./notes",
+      "module": "./corpus.ts",
+      "options": { "path": "./notes" }
+    }
+  ]
+}

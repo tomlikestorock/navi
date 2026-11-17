@@ -1,0 +1,14 @@
+{
+  // Self-contained eval fixture: a files corpus over the sibling ./docs.
+  // `navi eval` defaults to this file, resolved from the navi package root
+  // (not the caller's cwd), and reads ./labels.jsonl beside it.
+  // Runs anywhere, no external services.
+  "corpuses": [
+    {
+      "id": "docs",
+      "type": "files",
+      "description": "Eval corpus (fake arenas: deployment, git, security, data)",
+      "options": { "path": "./docs", "extensions": [".md"] }
+    }
+  ]
+}
