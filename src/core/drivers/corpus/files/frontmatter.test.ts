@@ -21,6 +21,12 @@ test("parses scalars, inline arrays and numbers", () => {
   });
 });
 
+test("parses the turn-relative knobs", () => {
+  const text = ["---", "surfacing:", "  minTurn: 4", "  cooldown: 3", "---", "Body."].join("\n");
+
+  expect(parseSurfacingFrontmatter(text)).toEqual({ minTurn: 4, cooldown: 3 });
+});
+
 test("parses block lists and quoted scalars", () => {
   const text = [
     "---",

@@ -3,10 +3,10 @@
  * session's seen-log and the session's model, and returns what to inject plus
  * the log to persist. The harness adapter owns storage and injection.
  *
- * Order: same-turn dedupe → caps → budget → byModel. byModel is resolved
- * first because it *supplies* the caps and budget it restricts; the effective
- * rule is the most restrictive match, and `force` is the one override that
- * beats everything except the dedupe. */
+ * Order: same-turn dedupe → turn gate → caps → budget → byModel. byModel is
+ * resolved first because it *supplies* the caps and budget it restricts; the
+ * effective rule is the most restrictive match, and `force` is the one
+ * override that beats everything except the dedupe and `cooldown`. */
 
 import type { CorpusHit, HitSurfacing, SurfacingConfig, SurfacingRule } from "#core/index.ts";
 import { formatHits, hitKey } from "#core/index.ts";
@@ -77,21 +77,29 @@ export function applyPolicy(hits: CorpusHit[], options: PolicyOptions): PolicyRe
     candidates.set(key, hit);
 
     const surfacing = hit.surfacing ?? options.corpusSurfacing?.get(hit.corpus);
-    if (isForced(surfacing?.force, options.model)) {
+    const entry = previous.get(key);
+    const mustShow = isForced(surfacing?.force, options.model);
+
+    // 2. Turn-relative gate. `force` lifts `minTurn` — its models always see
+    // this hit — but never `cooldown`, which the seen-log enforces for all.
+    if (!mustShow && turn < (surfacing?.minTurn ?? 0)) continue;
+    if (withinCooldown(surfacing?.cooldown, entry, turn)) continue;
+
+    if (mustShow) {
       forced.add(key);
       continue;
     }
-    // 2. Repetition caps, per hit identity.
-    if (!withinCaps(surfacing, previous.get(key), turn, rule)) continue;
+    // 3. Repetition caps, per hit identity.
+    if (!withinCaps(surfacing, entry, turn, rule)) continue;
     deferred.push(hit);
   }
 
-  // 3. Budget per injection. Forced hits override it.
+  // 4. Budget per injection. Forced hits override it.
   const budgeted = new Set(applyBudget(deferred, rule).map(hitKey));
   const kept = [...candidates].filter(([key]) => forced.has(key) || budgeted.has(key));
   const result = kept.map(([, hit]) => hit);
 
-  // 4. byModel was resolved into `rule` above; every injected hit is recorded
+  // 5. byModel was resolved into `rule` above; every injected hit is recorded
   // so the caps can see it next turn.
   const entries = new Map(previous);
   const now = Date.now();
@@ -137,6 +145,17 @@ function minOf(values: Array<number | undefined>): number | undefined {
 function isForced(force: string[] | undefined, model: string | undefined): boolean {
   if (force === undefined) return false;
   return force.includes("*") || (model !== undefined && force.includes(model));
+}
+
+/** `cooldown` suppresses a re-show until the turn number has advanced at
+ * least `cooldown` past the entry's last show. Only ever measured against a
+ * recorded show, so a first appearance is never gated. */
+function withinCooldown(
+  cooldown: number | undefined,
+  entry: SeenEntry | undefined,
+  turn: number,
+): boolean {
+  return cooldown !== undefined && entry !== undefined && turn - entry.turn < cooldown;
 }
 
 /** `once` is stricter than any configured session cap; `eager` lifts the
