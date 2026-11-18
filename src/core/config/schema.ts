@@ -23,8 +23,9 @@ export const HitSurfacingSchema = z.strictObject({
   /** Turn-relative gate: suppress until the session reaches this turn
    * ("only matters once you're deep in"). Turn numbers are 1-based. */
   minTurn: z.number().int().min(1).optional(),
-  /** Turn-relative gate: suppress a re-show within N turns of the last one
-   * ("don't nag"). Applies to every show, forced included. */
+  /** Turn-relative gate: skip the next N turns after a show ("don't nag");
+   * a re-show needs more than N turns of distance. Applies to every show,
+   * forced included. */
   cooldown: z.number().int().min(1).optional(),
 });
 

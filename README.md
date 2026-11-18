@@ -116,10 +116,9 @@ default is always on, so it can be omitted:
 
 A hit can opt out of repetition itself, in the corpus config or in a file's
 frontmatter (`surfacing:` — `repeat: eager|normal|once`, `force: [model refs]`,
-`priority`, `minTurn`, `cooldown`). `force` lifts the caps and budget for the
-listed models (or `*`) and `minTurn`; only the same-turn dedupe and `cooldown`
-are never overridden. `minTurn: N` suppresses a hit until the session reaches
-turn N; `cooldown: N` suppresses a re-show within N turns of the last one.
+`priority`, `minTurn`, `cooldown`). `minTurn: N` suppresses a hit until the
+session reaches turn N; `cooldown: N` skips the next N turns after a show. A
+hit declaring any `surfacing` of its own drops the corpus defaults wholesale.
 
 ```jsonc
 // navi.json — opt the model seat into the session gateway

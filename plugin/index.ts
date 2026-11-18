@@ -3,8 +3,9 @@
  * Admission surfacing: every admitted user prompt is analyzed, searched and
  * written back as one advisory instruction entry; `navi_search` and
  * `navi_pack` are deliberate pulls through the same pipeline. Before
- * injection the policy pass applies dedupe, repetition caps, budget
- * and `byModel` rules, keyed on a per-session seen-log in plugin storage.
+ * injection the policy pass applies dedupe, turn-relative gates, repetition
+ * caps, budget and `byModel` rules, keyed on a per-session seen-log in
+ * plugin storage.
  * Config comes from the normal global + project discovery, so corpuses,
  * embeddings, detector instances and model providers are all the merged
  * config's.

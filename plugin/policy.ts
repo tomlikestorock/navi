@@ -5,8 +5,7 @@
  *
  * Order: same-turn dedupe → turn gate → caps → budget → byModel. byModel is
  * resolved first because it *supplies* the caps and budget it restricts; the
- * effective rule is the most restrictive match, and `force` is the one
- * override that beats everything except the dedupe and `cooldown`. */
+ * effective rule is the most restrictive match. */
 
 import type { CorpusHit, HitSurfacing, SurfacingConfig, SurfacingRule } from "#core/index.ts";
 import { formatHits, hitKey } from "#core/index.ts";
@@ -80,10 +79,9 @@ export function applyPolicy(hits: CorpusHit[], options: PolicyOptions): PolicyRe
     const entry = previous.get(key);
     const mustShow = isForced(surfacing?.force, options.model);
 
-    // 2. Turn-relative gate. `force` lifts `minTurn` — its models always see
-    // this hit — but never `cooldown`, which the seen-log enforces for all.
+    // 2. Turn-relative gate (minTurn, cooldown).
     if (!mustShow && turn < (surfacing?.minTurn ?? 0)) continue;
-    if (withinCooldown(surfacing?.cooldown, entry, turn)) continue;
+    if (inCooldown(surfacing?.cooldown, entry, turn)) continue;
 
     if (mustShow) {
       forced.add(key);
@@ -147,15 +145,12 @@ function isForced(force: string[] | undefined, model: string | undefined): boole
   return force.includes("*") || (model !== undefined && force.includes(model));
 }
 
-/** `cooldown` suppresses a re-show until the turn number has advanced at
- * least `cooldown` past the entry's last show. Only ever measured against a
- * recorded show, so a first appearance is never gated. */
-function withinCooldown(
+function inCooldown(
   cooldown: number | undefined,
   entry: SeenEntry | undefined,
   turn: number,
 ): boolean {
-  return cooldown !== undefined && entry !== undefined && turn - entry.turn < cooldown;
+  return cooldown !== undefined && entry !== undefined && turn - entry.turn <= cooldown;
 }
 
 /** `once` is stricter than any configured session cap; `eager` lifts the
