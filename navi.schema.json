@@ -51,6 +51,16 @@
               },
               "priority": {
                 "type": "number"
+              },
+              "minTurn": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "cooldown": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
               }
             },
             "additionalProperties": false

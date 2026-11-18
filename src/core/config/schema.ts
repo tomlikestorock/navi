@@ -15,10 +15,18 @@ export const HitSurfacingSchema = z.strictObject({
    * most once per session, `normal` uses the configured caps. */
   repeat: z.enum(["eager", "normal", "once"]).optional(),
   /** Model refs (`provider/id`, or `*`) that always see this hit. Lifts the
-   * caps, budget and byModel rules — never the same-turn dedupe. */
+   * caps, budget and byModel rules and `minTurn` — never the same-turn
+   * dedupe, never `cooldown`. */
   force: z.array(z.string().min(1)).optional(),
   /** Ranking weight; carried for drivers, core enforces nothing. */
   priority: z.number().optional(),
+  /** Turn-relative gate: suppress until the session reaches this turn
+   * ("only matters once you're deep in"). Turn numbers are 1-based. */
+  minTurn: z.number().int().min(1).optional(),
+  /** Turn-relative gate: skip the next N turns after a show ("don't nag");
+   * a re-show needs more than N turns of distance. Applies to every show,
+   * forced included. */
+  cooldown: z.number().int().min(1).optional(),
 });
 
 /** One caps+budget rule. `byModel` entries use this shape. */

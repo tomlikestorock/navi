@@ -32,7 +32,13 @@ test("hit surfacing metadata is strict and optional per field", () => {
     priority: 2,
     repeat: "eager",
   });
+  expect(HitSurfacingSchema.parse({ minTurn: 4, cooldown: 3 })).toEqual({
+    minTurn: 4,
+    cooldown: 3,
+  });
   expect(() => HitSurfacingSchema.parse({ repeat: "always" })).toThrow();
   expect(() => HitSurfacingSchema.parse({ priority: "high" })).toThrow();
+  expect(() => HitSurfacingSchema.parse({ minTurn: 0 })).toThrow();
+  expect(() => HitSurfacingSchema.parse({ cooldown: 1.5 })).toThrow();
   expect(() => HitSurfacingSchema.parse({ unknown: true })).toThrow();
 });

@@ -57,6 +57,28 @@ test("repeat: once shows a hit exactly once; eager ignores the session cap", () 
   expect(surfacing(hit("a", { surfacing: { repeat: "eager" } }), 5)).toEqual([1, 1, 1, 1, 1]);
 });
 
+test("minTurn suppresses until the session reaches the turn", () => {
+  const gated = hit("a", { surfacing: { minTurn: 4 } });
+  expect(surfacing(gated, 3)).toEqual([0, 0, 0]);
+  expect(surfacing(gated, 6)).toEqual([0, 0, 0, 1, 1, 1]);
+});
+
+test("cooldown skips the next N turns after a show", () => {
+  expect(surfacing(hit("a", { surfacing: { cooldown: 3 } }), 6)).toEqual([1, 0, 0, 0, 1, 0]);
+});
+
+test("force lifts minTurn but never cooldown", () => {
+  const forced = hit("a", { surfacing: { minTurn: 4, force: ["anthropic/x"] } });
+  expect(surfacing(forced, 3, undefined, "anthropic/x")).toEqual([1, 1, 1]);
+  expect(surfacing(forced, 3, undefined, "openai/y")).toEqual([0, 0, 0]);
+  expect(
+    surfacing(hit("a", { surfacing: { minTurn: 4, force: ["*"] } }), 3, undefined, "openai/y"),
+  ).toEqual([1, 1, 1]);
+
+  const cooled = hit("a", { surfacing: { cooldown: 3, force: ["anthropic/x"] } });
+  expect(surfacing(cooled, 5, undefined, "anthropic/x")).toEqual([1, 0, 0, 0, 1]);
+});
+
 test("a second pass in the same turn still honors perTurn", () => {
   const first = applyPolicy([hit("a")], { seen: EMPTY_SEEN, turn: 1 });
   const repeat = applyPolicy([hit("a")], { seen: first.seen, turn: 1 });
@@ -70,6 +92,15 @@ test("a second pass in the same turn still honors perTurn", () => {
   expect(twice.hits.map((candidate) => candidate.id)).toEqual(["a"]);
   expect(twice.seen.entries[0]?.turnShows).toBe(2);
   expect(twice.seen.entries[0]?.shows).toBe(2);
+
+  // cooldown suppresses a same-turn re-show even when perTurn allows it.
+  expect(
+    applyPolicy([hit("a", { surfacing: { cooldown: 2 } })], {
+      config: { repetition: { perTurn: 2, perSession: 3 } },
+      seen: first.seen,
+      turn: 1,
+    }).hits,
+  ).toEqual([]);
 });
 
 test("force lifts the session cap for a matching model, never for another", () => {
@@ -172,6 +203,35 @@ test("corpus defaults fill hits that declare nothing; a hit's own wins", () => {
     model: "anthropic/x",
   });
   expect(overridden.hits).toEqual([]);
+});
+
+test("corpus defaults carry the turn-relative knobs", () => {
+  const corpuses = new Map([["docs", { minTurn: 2 }]]);
+
+  const gated = applyPolicy([hit("a")], {
+    corpusSurfacing: corpuses,
+    seen: EMPTY_SEEN,
+    turn: 1,
+  });
+  expect(gated.hits).toEqual([]);
+
+  const ready = applyPolicy([hit("a")], {
+    corpusSurfacing: corpuses,
+    seen: EMPTY_SEEN,
+    turn: 2,
+  });
+  expect(ready.hits).toHaveLength(1);
+});
+
+test("a hit's own surfacing drops the corpus defaults wholesale", () => {
+  const corpuses = new Map([["docs", { minTurn: 2 }]]);
+  expect(
+    applyPolicy([hit("a", { surfacing: {} })], {
+      corpusSurfacing: corpuses,
+      seen: EMPTY_SEEN,
+      turn: 1,
+    }).hits,
+  ).toHaveLength(1);
 });
 
 test("only injected hits are recorded, in ranking order", () => {
